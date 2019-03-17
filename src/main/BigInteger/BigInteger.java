@@ -23,7 +23,7 @@ public final class BigInteger {
     public int bigSize;
 
     //создаём конструктор из строки
-    public BigInteger(String val) {
+     BigInteger(String val) {
         if ( !val.matches("[0-9]+") )
             throw new IllegalArgumentException("Число введено неверно");
         String[] splitNumber = val.split("");
@@ -36,10 +36,10 @@ public final class BigInteger {
 
     // Константы:
     private final int MAX_ELEMENT = 9; // максимальное число в ячейке массива
-    private final int MIN_ELEMENT = 0; // минимальное число в ячейке массива
-    private final int ELEMENT_BASE = 10;
-    private final Byte[] ZERO = {0};
-    private final Byte[] ONE = {1};
+    private final byte MIN_ELEMENT =(byte)0; // минимальное число в ячейке массива
+    private final byte ELEMENT_BASE = 10;
+    //private final Byte[] ZERO = {0};
+    //private final Byte[] ONE = {1};
 
     // метод "Сложение"
     private ArrayList <Byte> plusHelp(ArrayList <Byte> max, ArrayList <Byte> min) {
@@ -50,45 +50,31 @@ public final class BigInteger {
         ArrayList <Byte> result = max;
         for ( int i = 0; i < minSize; i++ ) {
             count = (max.get(i) + min.get(i) + nextRank);
-            nextRank = 0;
-            if ( count > MAX_ELEMENT ) {
-                nextRank = count - ELEMENT_BASE;
-                result.set(i, (byte) 9);
-            } else {
-                result.set(i, (byte) count);
-            }
+            nextRank = count/ELEMENT_BASE;
+            result.set(i, (byte)(count % ELEMENT_BASE ));
         }
         for ( int i = minSize; i < maxSize; i++ ) {
-            if ( nextRank == 0 ) {
-                break;
-            }
-            count = max.get(i) + nextRank;
-            nextRank = 0;
-            if ( count > MAX_ELEMENT ) {
-                nextRank = count - ELEMENT_BASE;
-                result.set(i, (byte) 9);
-            }
+            if ( nextRank == 0 ) break;
+            count = max.get(i) + 1;
+            nextRank = count/ELEMENT_BASE;
+            result.set(i, (byte)(count % ELEMENT_BASE ));
         }
-        if ( nextRank != 0 ) {
-            result.add((byte) nextRank);
-        }
+        if ( nextRank != 0 ) result.add((byte) nextRank);
+
         return result;
     }
 
     public String plus(BigInteger this,BigInteger other) {
         ArrayList <Byte> result;
-        if ( equality(other) == 1 ) {
+        if ( equality(other) == 1 )
             result = plusHelp(this.byteEl, other.byteEl);
-        } else {
+        else
             result = plusHelp(other.byteEl, this.byteEl);
-        }
-        if ( toString(result) == "" ) {
-            return "0";
-        } else
-        { System.out.println(toString(result));
+        if ( toString(result) == "" ) return "0";
+        else
             return toString(result);
-        }
     }
+
 
     // Метод "Вычитание"
     private ArrayList <Byte> minusHelp(ArrayList <Byte> minuend, ArrayList <Byte> subtrahend) {
@@ -125,7 +111,7 @@ public final class BigInteger {
 
     public String minus(BigInteger other) {
         ArrayList <Byte> result = minusHelp(this.byteEl, other.byteEl);
-        if ( toString(result) == "" ) {
+        if ( toString(result).isEmpty()) {
             return "0";
         } else
             return toString(result);
@@ -176,8 +162,7 @@ public final class BigInteger {
     // метод "Деление" (деление столбиком)
     public String div(BigInteger other) {
         ArrayList <Byte> controller = this.byteEl;
-        ArrayList <Byte> result = null;
-        result.add((byte) 0);
+        ArrayList <Byte> result = new ArrayList <>(0);
         ArrayList <Byte> zero = new ArrayList <Byte>();
         zero.add((byte) 0);
         ArrayList <Byte> first = new ArrayList <Byte>();
@@ -208,6 +193,7 @@ public final class BigInteger {
             }
             result.add(0, (byte) n);
         }
+        System.out.println(result);
         return toString(result);
     }
 
@@ -287,14 +273,14 @@ public final class BigInteger {
     private void zerosDeath(ArrayList <Byte> val) {
         int k = 0;  // переменная, показывающая нули, идущие перед числом
         int i;
-        for ( i = val.size() - 1; k == 0; i-- ) {
+        for ( i = val.size() - 1; k == 0 && i>=0; i-- ) {
             if ( val.get(i) == k ) val.remove(i);
             else k = 1;
         }
     }
 
     // превращение массив в строку
-    private String toString(ArrayList <Byte> val) {
+    public String toString(ArrayList <Byte> val) {
         String result = new String();
         zerosDeath(val);
         int size = val.size();
